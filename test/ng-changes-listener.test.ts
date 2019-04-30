@@ -34,6 +34,19 @@ class Test {
   testProps1And2EmitterChanged = new EventEmitter<[number, number]>();
 }
 
+class TestWithNgOnChanges {
+  props0 = 0;
+  props1 = 0;
+
+  ngOnChanges() {
+    this.props0 = 1;
+  }
+
+  @ChangeListener(['props1'])
+  testProps1Changed([props1]: number[]) {
+    this.props1 = props1;
+  }
+}
 const callNgOnChanges = (host: any, changes: SimpleChanges) => host.ngOnChanges(changes);
 
 describe('ChangeListener', () => {
@@ -65,7 +78,6 @@ describe('ChangeListener', () => {
         currentValue: 2,
       } as SimpleChange,
     });
-    console.log(test);
     expect(test.props1).toBe(1);
     expect(test.props2).toBe(2);
   });
@@ -82,5 +94,16 @@ describe('ChangeListener', () => {
     });
     expect(test.props3).toBe(1);
     expect(test.props4).toBe(2);
+  });
+  it('execute the original ngOnChanges', () => {
+    const test = new TestWithNgOnChanges();
+    expect('ngOnChanges' in test).toBeTruthy();
+    callNgOnChanges(test, {
+      props1: {
+        currentValue: 1,
+      } as SimpleChange,
+    });
+    expect(test.props0).toBe(1);
+    expect(test.props1).toBe(1);
   });
 });
