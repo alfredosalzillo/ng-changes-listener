@@ -24,7 +24,7 @@ export default {
     // Allow json resolution
     rollupPluginJson(),
     // Compile TypeScript files
-    rollupPluginTypescript2({ useTsconfigDeclarationDir: true }),
+    rollupPluginTypescript2({ tsconfig: 'tsconfig.build.json', useTsconfigDeclarationDir: true }),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
     rollupPluginCommonjs(),
     // Allow node_modules resolution, so you can use 'external' to control
