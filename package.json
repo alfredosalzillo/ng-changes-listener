@@ -9,7 +9,7 @@
   "files": [
     "dist"
   ],
-  "author": "alfredo salzillo <alfredo.salzillo@progettopa.it>",
+  "author": "alfredo salzillo <alfredo.salzillo@virgilio.it>",
   "repository": {
     "type": "git",
     "url": "https://github.com/alfredosalzillo/ng-changes-listener"
