@@ -1,8 +1,8 @@
 import { SimpleChanges, EventEmitter } from '@angular/core';
 import 'reflect-metadata';
 
-export type ChangeListenerFn = (this: Object, change: SimpleChanges) => void;
-export type ChangesPredicate = (changes: SimpleChanges) => boolean;
+type ChangeListenerFn = (this: Object, change: SimpleChanges) => void;
+type ChangesPredicate = (changes: SimpleChanges) => boolean;
 
 export class ListenerData {
   constructor(public changes: SimpleChanges) {}
@@ -67,6 +67,7 @@ const NgChangesListener = (
           }),
         );
       }
+      throw new Error(`${propertyKey.toString()} is neither an EventEmitter or a Function`);
     }),
   );
 };

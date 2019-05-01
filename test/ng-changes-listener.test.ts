@@ -55,6 +55,13 @@ class TestWithNgOnChanges {
     this.props1 = props1;
   }
 }
+class TestWithException {
+  props1 = 0;
+
+  @ChangeListener('props1')
+  testProps1Changed: number = 0;
+}
+
 const callNgOnChanges = (host: any, changes: SimpleChanges) => host.ngOnChanges(changes);
 
 describe('ChangeListener', () => {
@@ -137,5 +144,14 @@ describe('ChangeListener', () => {
     });
     expect(test.props0).toBe(1);
     expect(test.props1).toBe(1);
+  });
+  it('throw Error if listener is neither a Function or an EventEmitter', () => {
+    const test = new TestWithException();
+    expect('ngOnChanges' in test).toBeTruthy();
+    expect(() => callNgOnChanges(test, {
+      props1: {
+        currentValue: 1,
+      } as SimpleChange,
+    })).toThrowError();
   });
 });
