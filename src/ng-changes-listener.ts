@@ -66,7 +66,7 @@ export const ChangeListener = <C>(input: StringKeyOf<C>): PropertyDecorator => (
         );
         return listener.call(
           host,
-          ...parametersType.map(paramType => {
+          ...parametersType.map((paramType) => {
             if (paramType === SimpleChange) {
               return changes[input];
             }

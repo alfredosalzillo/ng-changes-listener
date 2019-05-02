@@ -10,7 +10,7 @@ class Test {
   constructor() {
     this.testProps1And2EmitterChanged
       .pipe(
-        tap(props2 => {
+        tap((props2) => {
           this.props2 = props2;
         }),
       )
