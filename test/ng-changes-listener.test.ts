@@ -5,41 +5,30 @@ import { tap } from 'rxjs/operators';
 class Test {
   props1 = 0;
   props2 = 0;
-  props3 = 0;
-  props4 = 0;
-  props5 = 0;
-  changes: any = null;
+  change: any = null;
 
   constructor() {
     this.testProps1And2EmitterChanged
       .pipe(
-        tap(([props3, props4]) => {
-          this.props3 = props3;
-          this.props4 = props4;
-        }),
+        tap(props2 => {
+          this.props2 = props2;
+        })
       )
       .subscribe();
   }
 
-  @ChangeListener(['props1'])
-  testProps1Changed([props1]: number[]) {
+  @ChangeListener('props1')
+  testProps1Changed(props1: number) {
     this.props1 = props1;
   }
 
-  @ChangeListener('props5')
-  testProps5SingleChanged(props5: number) {
-    this.props5 = props5;
+  @ChangeListener('props1')
+  testProps1ChangedSimpleChange(change: SimpleChange) {
+    this.change = change;
   }
 
-  @ChangeListener(['props1', 'props2'])
-  testProps1And2Changed([props1, props2]: number[], data: ListenerData) {
-    this.props1 = props1;
-    this.props2 = props2;
-    this.changes = data.changes;
-  }
-
-  @ChangeListener(['props3', 'props4'])
-  testProps1And2EmitterChanged = new EventEmitter<[number, number]>();
+  @ChangeListener('props2')
+  testProps1And2EmitterChanged = new EventEmitter<number>();
 }
 
 class TestWithNgOnChanges {
@@ -50,8 +39,9 @@ class TestWithNgOnChanges {
     this.props0 = 1;
   }
 
-  @ChangeListener(['props1'])
-  testProps1Changed([props1]: number[]) {
+  @ChangeListener('props1')
+  testProps1Changed(props1: number) {
+    console.log(props1);
     this.props1 = props1;
   }
 }
@@ -70,8 +60,8 @@ describe('ChangeListener', () => {
     expect('ngOnChanges' in test).toBeTruthy();
     callNgOnChanges(test, {
       props1: {
-        currentValue: 1,
-      } as SimpleChange,
+        currentValue: 1
+      } as SimpleChange
     });
     expect(test.props1).toBe(1);
   });
@@ -82,65 +72,34 @@ describe('ChangeListener', () => {
     expect(test.props1).toBe(0);
     expect(test.props2).toBe(0);
   });
-  it('works with multiple inputs nothing change', () => {
-    const test = new Test();
-    expect('ngOnChanges' in test).toBeTruthy();
-    callNgOnChanges(test, {
-      props1: {
-        currentValue: 1,
-      } as SimpleChange,
-      props2: {
-        currentValue: 2,
-      } as SimpleChange,
-    });
-    expect(test.props1).toBe(1);
-    expect(test.props2).toBe(2);
-  });
-  it('will pass ListenerData if is a type of the parameters', () => {
+  it('will pass the SimpleChange if is a type of the parameters', () => {
     const test = new Test();
     expect('ngOnChanges' in test).toBeTruthy();
     const changes = {
       props1: {
-        currentValue: 1,
-      } as SimpleChange,
-      props2: {
-        currentValue: 2,
-      } as SimpleChange,
+        currentValue: 1
+      } as SimpleChange
     };
     callNgOnChanges(test, changes);
-    expect(test.changes).toBe(changes);
-  });
-  it('if no array of inputs, pass no array but single value', () => {
-    const test = new Test();
-    expect('ngOnChanges' in test).toBeTruthy();
-    callNgOnChanges(test, {
-      props5: {
-        currentValue: 5,
-      } as SimpleChange,
-    });
-    expect(test.props5).toBe(5);
+    expect(test.change).toBe(changes.props1);
   });
   it('works with emitter', () => {
     const test = new Test();
     expect('ngOnChanges' in test).toBeTruthy();
     callNgOnChanges(test, {
-      props3: {
-        currentValue: 1,
-      } as SimpleChange,
-      props4: {
-        currentValue: 2,
-      } as SimpleChange,
+      props2: {
+        currentValue: 1
+      } as SimpleChange
     });
-    expect(test.props3).toBe(1);
-    expect(test.props4).toBe(2);
+    expect(test.props2).toBe(1);
   });
   it('execute the original ngOnChanges', () => {
     const test = new TestWithNgOnChanges();
     expect('ngOnChanges' in test).toBeTruthy();
     callNgOnChanges(test, {
       props1: {
-        currentValue: 1,
-      } as SimpleChange,
+        currentValue: 1
+      } as SimpleChange
     });
     expect(test.props0).toBe(1);
     expect(test.props1).toBe(1);
@@ -148,10 +107,12 @@ describe('ChangeListener', () => {
   it('throw Error if listener is neither a Function or an EventEmitter', () => {
     const test = new TestWithException();
     expect('ngOnChanges' in test).toBeTruthy();
-    expect(() => callNgOnChanges(test, {
-      props1: {
-        currentValue: 1,
-      } as SimpleChange,
-    })).toThrowError();
+    expect(() =>
+      callNgOnChanges(test, {
+        props1: {
+          currentValue: 1
+        } as SimpleChange
+      })
+    ).toThrowError();
   });
 });
