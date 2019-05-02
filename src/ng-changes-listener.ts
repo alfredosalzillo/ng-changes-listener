@@ -4,11 +4,8 @@ import 'reflect-metadata';
 type StringKeyOf<C> = Extract<keyof C, string>;
 type ChangeListenerFn = (this: Object, change: SimpleChanges) => void;
 
-export class ListenerData {
-  constructor(public changes: SimpleChanges) {}
-}
-
-const isEventEmitter = <T = any>(value: any): value is EventEmitter<T> => 'emit' in value;
+const isEventEmitter = <T = any>(value: any): value is EventEmitter<T> =>
+  'emit' in value;
 
 const changesListenersKey = Symbol('changes-listeners');
 const getChangesListeners = (target: Object) =>
@@ -18,11 +15,15 @@ const defineChangesListeners = (target: Object) =>
 const pushChangesListeners = (target: Object, value: Function) =>
   getChangesListeners(target).push(value);
 
-const ngOnChanges = function(this: Object, changes: SimpleChanges) {
-  getChangesListeners(this).forEach((listener: Function) => listener.call(this, changes));
+const ngOnChanges = function (this: Object, changes: SimpleChanges) {
+  getChangesListeners(this).forEach((listener: Function) =>
+    listener.call(this, changes),
+  );
 };
-const action = (operation: (host: Object, changes: SimpleChanges) => void): ChangeListenerFn =>
-  function(this: object, changes: SimpleChanges) {
+const action = (
+  operation: (host: Object, changes: SimpleChanges) => void,
+): ChangeListenerFn =>
+  function (this: object, changes: SimpleChanges) {
     operation(this, changes);
   };
 
@@ -33,7 +34,7 @@ const action = (operation: (host: Object, changes: SimpleChanges) => void): Chan
  * */
 export const ChangeListener = <C>(input: StringKeyOf<C>): PropertyDecorator => (
   target: any,
-  propertyKey: string | symbol
+  propertyKey: string | symbol,
 ) => {
   if (!Reflect.hasOwnMetadata(changesListenersKey, target)) {
     defineChangesListeners(target);
@@ -41,7 +42,7 @@ export const ChangeListener = <C>(input: StringKeyOf<C>): PropertyDecorator => (
       pushChangesListeners(target, target.ngOnChanges);
     }
     Object.defineProperty(target, 'ngOnChanges', {
-      value: ngOnChanges
+      value: ngOnChanges,
     });
   }
   const Type = Reflect.getMetadata('design:type', target, propertyKey);
@@ -58,7 +59,11 @@ export const ChangeListener = <C>(input: StringKeyOf<C>): PropertyDecorator => (
         return listener.emit(changes[input].currentValue);
       }
       if (Type === Function) {
-        const parametersType: any[] = Reflect.getMetadata('design:paramtypes', target, propertyKey);
+        const parametersType: any[] = Reflect.getMetadata(
+          'design:paramtypes',
+          target,
+          propertyKey,
+        );
         return listener.call(
           host,
           ...parametersType.map(paramType => {
@@ -66,10 +71,12 @@ export const ChangeListener = <C>(input: StringKeyOf<C>): PropertyDecorator => (
               return changes[input];
             }
             return changes[input].currentValue;
-          })
+          }),
         );
       }
-      throw new Error(`${propertyKey.toString()} is neither an EventEmitter or a Function`);
-    })
+      throw new Error(
+        `${propertyKey.toString()} is neither an EventEmitter or a Function`,
+      );
+    }),
   );
 };

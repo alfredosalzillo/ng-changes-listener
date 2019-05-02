@@ -1,5 +1,5 @@
 import { EventEmitter, SimpleChange, SimpleChanges } from '@angular/core';
-import { ChangeListener, ListenerData } from '../src/ng-changes-listener';
+import { ChangeListener } from '../src/ng-changes-listener';
 import { tap } from 'rxjs/operators';
 
 class Test {
@@ -12,7 +12,7 @@ class Test {
       .pipe(
         tap(props2 => {
           this.props2 = props2;
-        })
+        }),
       )
       .subscribe();
   }
@@ -52,7 +52,8 @@ class TestWithException {
   testProps1Changed: number = 0;
 }
 
-const callNgOnChanges = (host: any, changes: SimpleChanges) => host.ngOnChanges(changes);
+const callNgOnChanges = (host: any, changes: SimpleChanges) =>
+  host.ngOnChanges(changes);
 
 describe('ChangeListener', () => {
   it('works with one input if something change', () => {
@@ -60,8 +61,8 @@ describe('ChangeListener', () => {
     expect('ngOnChanges' in test).toBeTruthy();
     callNgOnChanges(test, {
       props1: {
-        currentValue: 1
-      } as SimpleChange
+        currentValue: 1,
+      } as SimpleChange,
     });
     expect(test.props1).toBe(1);
   });
@@ -77,8 +78,8 @@ describe('ChangeListener', () => {
     expect('ngOnChanges' in test).toBeTruthy();
     const changes = {
       props1: {
-        currentValue: 1
-      } as SimpleChange
+        currentValue: 1,
+      } as SimpleChange,
     };
     callNgOnChanges(test, changes);
     expect(test.change).toBe(changes.props1);
@@ -88,8 +89,8 @@ describe('ChangeListener', () => {
     expect('ngOnChanges' in test).toBeTruthy();
     callNgOnChanges(test, {
       props2: {
-        currentValue: 1
-      } as SimpleChange
+        currentValue: 1,
+      } as SimpleChange,
     });
     expect(test.props2).toBe(1);
   });
@@ -98,8 +99,8 @@ describe('ChangeListener', () => {
     expect('ngOnChanges' in test).toBeTruthy();
     callNgOnChanges(test, {
       props1: {
-        currentValue: 1
-      } as SimpleChange
+        currentValue: 1,
+      } as SimpleChange,
     });
     expect(test.props0).toBe(1);
     expect(test.props1).toBe(1);
@@ -110,9 +111,9 @@ describe('ChangeListener', () => {
     expect(() =>
       callNgOnChanges(test, {
         props1: {
-          currentValue: 1
-        } as SimpleChange
-      })
+          currentValue: 1,
+        } as SimpleChange,
+      }),
     ).toThrowError();
   });
 });
