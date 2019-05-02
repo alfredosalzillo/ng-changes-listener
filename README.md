@@ -7,8 +7,8 @@ Add NgOnChanges listener using method and property decorator.
 ## Why?
 
 As today to listen to changes why need to implement `ngOnChanges`
-or create setter and private variables method and lines of code
-for every `@Input()` we wont to do stuff on changes.
+or create **setter and private variables** for every `@Input()`
+we want to listen changes.
 
 Without **ng-changes-listeners**:
 ```typescript
@@ -31,9 +31,6 @@ Without **ng-changes-listeners**:
       }
       if ('props2' in changes) {
         console.log(`props2 changed: ${changes['props2'].currentValue}`);
-      }
-      if ('props1' in changes && 'props2' in changes) {
-        console.log(`props1 and props2 changed: ${changes['props1'].currentValue} ${changes['props2'].currentValue}`);
       }
     }
   }
@@ -62,10 +59,6 @@ With **ng-changes-listeners**:
     @ChangeListener('props2') props2Changed(props2: number) {
       console.log(`props2 changed: ${props2}`);
     }
-    
-    @ChangeListener(['props1', 'props2']) props1And2Changed([props1, props2]) {
-      console.log(`props1 and props2 changed: ${props1} ${props2}`);
-    }
   }
 ```
 
@@ -85,11 +78,15 @@ in `tsconfig.json` must be `true`.
 
 This library expose the `ChangeListener` decorator generator.
 
-`ChangeListener` accept a name or an array of properties name.
-If the property or the properties all changes call the decorated method or emit the `EventEmitter`.
+`ChangeListener` accept a property name of the host class.
+WHen the property change call the decorated method or emit the `EventEmitter`.
+
+* support method listener
+* support `EventEmitter` listener
+* support `SimpleChange` as parameter type in method
 
 ```typescript
-  import { Component, Input, EventEmitter } from '@angular/core';
+  import { Component, Input, EventEmitter, SimpleChange } from '@angular/core';
   import { ChangeListener } from 'ng-changes-listeners';
   
   @Component({
@@ -109,13 +106,13 @@ If the property or the properties all changes call the decorated method or emit 
       console.log(`props1 changed: ${props1}`);
     }
     
-    /// `props2Change` will emit the props1 currentValue 
-    @ChangeListener('props2') props2Change = new EventEmitter<number>()
-    
-    /// `props1And2Changed` will be called when props1 and prop2 both change at the same time
-    /// to props1And2Changed will be passed an array of the props1 and props2 currentValue
-    @ChangeListener(['props1', 'props2']) props1And2Changed([props1, props2]) {
-      console.log(`props1 and props2 changed: ${props1} ${props2}`);
+    /// `props1Changed` will be called when props1 change
+    /// to props1Changed1 will be passed only the props1 SimpleChange
+    @ChangeListener('props1') props1Changed1(change: SimpleChange) {
+      console.log(`props1 changed: ${change.currentValue}`);
     }
-  }
+    
+    /// `props2Change` will emit the props1 currentValue 
+    @ChangeListener('props2') props2Change = new EventEmitter<number>();
+}
 ```
