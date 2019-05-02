@@ -74,7 +74,8 @@
   },
   "prettier": {
     "semi": true,
-    "singleQuote": true
+    "singleQuote": true,
+    "trailingComma": "all"
   },
   "commitlint": {
     "extends": [
